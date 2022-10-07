@@ -1,22 +1,29 @@
+import 'package:hive/hive.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:movie_app/data/persistence/hive_constants.dart';
 import 'package:movie_app/data/vos/base_actor_vo.dart';
 import 'package:movie_app/data/vos/movie_vo.dart';
 
 part 'actor_vo.g.dart';
 
 @JsonSerializable()
+@HiveType(typeId: HIVE_TYPE_ID_ACTOR_VO, adapterName: "ActorVOAdapter")
 class ActorVO extends BaseActorVO{
 
  /* @JsonKey(name: "profile_path")
   String? profilePath;
 */
   @JsonKey(name: "adult")
+  @HiveField(3)
   bool? adult;
 
+
   @JsonKey(name: "id")
+  @HiveField(4)
   int id;
 
   @JsonKey(name: "known_for")
+  @HiveField(5)
   List<MovieVO>? knownFor;
 /*
 
@@ -25,6 +32,7 @@ class ActorVO extends BaseActorVO{
 */
 
   @JsonKey(name: "popularity")
+  @HiveField(6)
   double? popularity;
 
 

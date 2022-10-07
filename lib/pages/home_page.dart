@@ -42,12 +42,22 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+    // Now Playing Movies
     mMovieModel.getNowPlayingMovies(1)
     ?.then((movieList){
       setState(() {
         mNowPlayingMovieList = movieList ;
       });
 
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
+
+    // Now Playing Movies Database
+    mMovieModel.getNowPlayingMoviesFromDatabase().then((moviesList){
+      setState(() {
+        mNowPlayingMovieList = moviesList;
+      });
     }).catchError((error){
       debugPrint(error.toString());
     });
@@ -61,6 +71,14 @@ class _HomePageState extends State<HomePage> {
     }).catchError((error){
       debugPrint(error.toString());
     });
+    // Get Popular Movies Database
+    mMovieModel.getPopularMoviesFromDatabase().then((moviesList){
+      setState(() {
+        mNowPlayingMovieList = moviesList;
+      });
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
 
     mMovieModel.getTopRatedMovies(1)
         ?.then((movieList){
@@ -68,6 +86,15 @@ class _HomePageState extends State<HomePage> {
         mShowCaseMovieList = movieList ;
       });
 
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
+
+    // Top Rated Movies Database
+    mMovieModel.getTopRatedMoviesFromDatabase().then((moviesList){
+      setState(() {
+        mNowPlayingMovieList = moviesList;
+      });
     }).catchError((error){
       debugPrint(error.toString());
     });
@@ -84,7 +111,31 @@ class _HomePageState extends State<HomePage> {
       debugPrint(error.toString());
     });
 
+    // Get Genre Database
+    mMovieModel.getGenresFromDatabase()
+        ?.then((genres) {
+      setState(() {
+        mGenreList = genres;
+
+        ///// Movies by Genre
+        _getMoviesByGenreAndRefresh(genres?.first.id ?? 0);
+      });
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
+
+
     mMovieModel.getActors(1)
+        ?.then((actors) {
+      setState(() {
+        mActors = actors ;
+      });
+    }).catchError((error) {
+      debugPrint(error.toString());
+    });
+
+    // Get Actors From Database
+    mMovieModel.getActorsFromDatabase()
         ?.then((actors) {
       setState(() {
         mActors = actors ;

@@ -3,6 +3,59 @@
 part of 'actor_vo.dart';
 
 // **************************************************************************
+// TypeAdapterGenerator
+// **************************************************************************
+
+class ActorVOAdapter extends TypeAdapter<ActorVO> {
+  @override
+  final int typeId = 1;
+
+  @override
+  ActorVO read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ActorVO(
+      fields[3] as bool?,
+      fields[4] as int,
+      (fields[5] as List?)?.cast<MovieVO>(),
+      fields[6] as double?,
+      fields[0] as String,
+      fields[1] as String,
+    );
+  }
+
+  @override
+  void write(BinaryWriter writer, ActorVO obj) {
+    writer
+      ..writeByte(6)
+      ..writeByte(3)
+      ..write(obj.adult)
+      ..writeByte(4)
+      ..write(obj.id)
+      ..writeByte(5)
+      ..write(obj.knownFor)
+      ..writeByte(6)
+      ..write(obj.popularity)
+      ..writeByte(0)
+      ..write(obj.name)
+      ..writeByte(1)
+      ..write(obj.profilePath);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ActorVOAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+// **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 

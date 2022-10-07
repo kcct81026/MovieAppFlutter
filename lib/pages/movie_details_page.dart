@@ -40,7 +40,18 @@ class _MovieDetailsPageState extends State<MovieDetailsPage> {
   void initState() {
     super.initState();
 
-    mMovieModel.getMovieDetails(widget.movieId)
+   /* mMovieModel.getMovieDetails(widget.movieId)
+        ?.then((movie){
+      setState(() {
+        this.mMovie = movie;
+      });
+
+    }).catchError((error){
+      debugPrint(error.toString());
+    });
+*/
+    // movie details database
+    mMovieModel.getMovieDetailsFromDatabase(widget.movieId)
         ?.then((movie){
       setState(() {
         this.mMovie = movie;
