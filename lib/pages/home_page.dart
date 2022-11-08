@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     // Now Playing Movies
-    mMovieModel.getNowPlayingMovies(1)
+  /*  mMovieModel.getNowPlayingMovies(1)
     ?.then((movieList){
       setState(() {
         mNowPlayingMovieList = movieList ;
@@ -52,17 +52,18 @@ class _HomePageState extends State<HomePage> {
     }).catchError((error){
       debugPrint(error.toString());
     });
-
+*/
     // Now Playing Movies Database
-    mMovieModel.getNowPlayingMoviesFromDatabase().then((moviesList){
+    mMovieModel.getNowPlayingMoviesFromDatabaseReactive()?.listen((moviesList){
       setState(() {
         mNowPlayingMovieList = moviesList;
+
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint(error.toString());
     });
 
-    mMovieModel.getPopularMovies(1)
+  /*  mMovieModel.getPopularMovies(1)
         ?.then((movieList){
       setState(() {
         mPopularMovieList = movieList ;
@@ -70,17 +71,20 @@ class _HomePageState extends State<HomePage> {
 
     }).catchError((error){
       debugPrint(error.toString());
-    });
+    });*/
     // Get Popular Movies Database
-    mMovieModel.getPopularMoviesFromDatabase().then((moviesList){
+    mMovieModel.getPopularMoviesFromDatabaseReactive().listen((moviesList){
       setState(() {
-        mNowPlayingMovieList = moviesList;
+        mPopularMovieList = moviesList;
+        mPopularMovieList.forEach((element) {
+          print("-------------------81026 ${element.backDropPath}");
+        });
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint(error.toString());
     });
 
-    mMovieModel.getTopRatedMovies(1)
+   /* mMovieModel.getTopRatedMovies(1)
         ?.then((movieList){
       setState(() {
         mShowCaseMovieList = movieList ;
@@ -88,18 +92,18 @@ class _HomePageState extends State<HomePage> {
 
     }).catchError((error){
       debugPrint(error.toString());
-    });
+    });*/
 
     // Top Rated Movies Database
-    mMovieModel.getTopRatedMoviesFromDatabase().then((moviesList){
+    mMovieModel.getNowTopRelatedMoviesFromDatabaseReactive().listen((moviesList){
       setState(() {
-        mNowPlayingMovieList = moviesList;
+        mShowCaseMovieList  = moviesList;
       });
-    }).catchError((error){
+    }).onError((error){
       debugPrint(error.toString());
     });
 
-    mMovieModel.getGenres()
+  /*  mMovieModel.getGenres()
         ?.then((genres) {
       setState(() {
         mGenreList = genres;
@@ -109,7 +113,7 @@ class _HomePageState extends State<HomePage> {
       });
     }).catchError((error) {
       debugPrint(error.toString());
-    });
+    });*/
 
     // Get Genre Database
     mMovieModel.getGenresFromDatabase()
@@ -125,14 +129,14 @@ class _HomePageState extends State<HomePage> {
     });
 
 
-    mMovieModel.getActors(1)
+  /*  mMovieModel.getActors(1)
         ?.then((actors) {
       setState(() {
         mActors = actors ;
       });
     }).catchError((error) {
       debugPrint(error.toString());
-    });
+    });*/
 
     // Get Actors From Database
     mMovieModel.getActorsFromDatabase()
