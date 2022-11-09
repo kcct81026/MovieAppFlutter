@@ -16,7 +16,6 @@ class ActorDao{
     await getActorBox().putAll(actorMap);
   }
 
-
   List<ActorVO> getAllActors(){
     return getActorBox().values.toList();
   }
@@ -24,4 +23,15 @@ class ActorDao{
   Box<ActorVO> getActorBox(){
     return Hive.box<ActorVO>(BOX_NAME_ACTOR_VO);
   }
+
+  // Reactive Programming
+  Stream<void> getActorssEventStream(){
+    return getActorBox().watch();
+  }
+
+  Stream<List<ActorVO>> getActorsStream(){
+    return Stream.value(getAllActors()
+        .toList());
+  }
+
 }
