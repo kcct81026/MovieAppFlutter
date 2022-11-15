@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/blocs/movie_details_bloc.dart';
 import 'package:movie_app/data/models/movie_model_impl.dart';
 import 'package:movie_app/network/api_constants.dart';
 import 'package:movie_app/resources/colors.dart';
@@ -30,98 +31,90 @@ class MovieDetailsPage extends StatefulWidget {
 
 class _MovieDetailsPageState extends State<MovieDetailsPage> {
 
-  MovieModel mMovieModel = MovieModelImpl();
-
-  MovieVO? mMovie;
-  List<CreditVO> mActorList = [];
-  List<CreditVO> mCreatorsList = [];
+  late MovieDetailsBloc _bloc;
 
   @override
   void initState() {
+    _bloc = MovieDetailsBloc(widget.movieId);
     super.initState();
-
-   /* mMovieModel.getMovieDetails(widget.movieId)
-        ?.then((movie){
-      setState(() {
-        this.mMovie = movie;
-      });
-
-    }).catchError((error){
-      debugPrint(error.toString());
-    });
-*/
-    // movie details database
-    mMovieModel.getMovieDetailsFromDatabase(widget.movieId)
-        ?.then((movie){
-      setState(() {
-        this.mMovie = movie;
-      });
-
-    }).catchError((error){
-      debugPrint(error.toString());
-    });
-
-    mMovieModel.getCreditsByMovie(widget.movieId)
-        ?.then((creditList){
-      setState(() {
-
-        this.mActorList = creditList.where((credit) => credit.isActor()).toList();
-        this.mCreatorsList = creditList.where((credit) => credit.isCreator()).toList();
-
-      });
-
-    }).catchError((error){
-      debugPrint(error.toString());
-    });
 
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: HOME_SCREEN_BACKGROUND_COLOR,
-        child: (mMovie != null)
-          ? CustomScrollView(
-          slivers: [
-            MovieDetailsSliverAppBarView(
-                  () => Navigator.pop(context),
-              mMovie!
-            ),
-            SliverList(
-              delegate: SliverChildListDelegate(
-                  [
-                    Container(
-                      margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                      child: TrailerSection(mMovie!),
-                    ),
-                    SizedBox(height: MARGIN_LARGE,),
-                    ActorAndCreatorSectionView(
-                      ACTOR_TITLE,
-                      "",
-                      seeMoreButtonVisibility: false,
-                      mActorList: this.mActorList,
-                    ),
-                    SizedBox(height: MARGIN_LARGE,),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
-                      child: AboutFilmSectionView(mMovie!),
-                    ),
-                    SizedBox(height: MARGIN_LARGE,),
-                    (mCreatorsList != null && mCreatorsList.isNotEmpty)
-                        ? ActorAndCreatorSectionView(
-                        CREATOR_TITLE,
-                        MORE_CREATORS_TITLE,
-                        mActorList: mCreatorsList
-                    ) : Container()
+      body: StreamBuilder(
+        stream: _bloc.movieStreamController.stream.asBroadcastStream(),
+        builder: (BuildContext context, AsyncSnapshot<MovieVO> snapshot) {
+          if(snapshot.hasData){
+            return Container(
+              color: HOME_SCREEN_BACKGROUND_COLOR,
+              child: (snapshot.data != null)
+                  ? CustomScrollView(
+                slivers: [
+                  MovieDetailsSliverAppBarView(
+                          () => Navigator.pop(context),
+                      snapshot.data!
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate(
+                        [
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                            child: TrailerSection(snapshot.data!),
+                          ),
+                          SizedBox(height: MARGIN_LARGE,),
+                          StreamBuilder(
+                            stream: _bloc.actorsStreamController.stream,
+                            builder: (BuildContext context, AsyncSnapshot<List<CreditVO>> actorsSnapShot) {
+                              return ActorAndCreatorSectionView(
+                                ACTOR_TITLE,
+                                "",
+                                seeMoreButtonVisibility: false,
+                                mActorList: actorsSnapShot.data ?? [],
+                              );
+                            },
 
-                  ]
-              ),
-            ),
-          ],
-        )
-          : Center(child: CircularProgressIndicator(),)
-        ,
+                          ),
+
+                          SizedBox(height: MARGIN_LARGE,),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: MARGIN_MEDIUM_2),
+                            child: AboutFilmSectionView(snapshot.data!),
+                          ),
+                          SizedBox(height: MARGIN_LARGE,),
+                          StreamBuilder(
+                            stream: _bloc.creditStreamController.stream,
+                            builder: (BuildContext context, AsyncSnapshot<List<CreditVO>> creatorSnapShot) {
+                              if (creatorSnapShot.hasData && creatorSnapShot.data!.isNotEmpty){
+                                  return  ActorAndCreatorSectionView(
+                                  CREATOR_TITLE,
+                                  MORE_CREATORS_TITLE,
+                                  mActorList: creatorSnapShot.data ?? []
+                              );
+                            }else{
+                              return Container();
+                            }
+                          },
+
+                          ),
+
+
+                        ]
+                    ),
+                  ),
+                ],
+              )
+                  : Center(child: CircularProgressIndicator(),)
+              ,
+            );
+          }
+          else{
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
       ),
     );
   }
